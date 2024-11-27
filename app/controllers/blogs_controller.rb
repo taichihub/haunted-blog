@@ -2,7 +2,6 @@
 
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
-
   before_action :set_blog, only: %i[show edit update destroy]
 
   def index
@@ -15,7 +14,11 @@ class BlogsController < ApplicationController
     @blog = Blog.new
   end
 
-  def edit; end
+  def edit
+    if current_user != @blog.user
+      redirect_to blog_url(@blog), alert: 'You are not authorized to edit this blog.'
+    end
+  end
 
   def create
     @blog = current_user.blogs.new(blog_params)
