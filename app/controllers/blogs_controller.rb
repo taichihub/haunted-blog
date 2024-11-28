@@ -3,6 +3,7 @@
 class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_blog, only: %i[show edit update destroy]
+  before_action :authorize_user!, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -14,11 +15,7 @@ class BlogsController < ApplicationController
     @blog = Blog.new
   end
 
-  def edit
-    if current_user != @blog.user
-      redirect_to blog_url(@blog), alert: 'You are not authorized to edit this blog.'
-    end
-  end
+  def edit; end
 
   def create
     @blog = current_user.blogs.new(blog_params)
@@ -46,6 +43,10 @@ class BlogsController < ApplicationController
 
   private
 
+  def authorize_user!
+    raise ActiveRecord::RecordNotFound if @blog.user != current_user
+  end
+  
   def set_blog
     @blog = Blog.find(params[:id])
   end
