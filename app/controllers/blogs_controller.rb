@@ -10,9 +10,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    if @blog.secret && @blog.user != current_user
-      raise ActiveRecord::RecordNotFound
-    end
+    raise ActiveRecord::RecordNotFound if @blog.secret && @blog.user != current_user
   end
 
   def new
@@ -50,14 +48,14 @@ class BlogsController < ApplicationController
   def authorize_user!
     raise ActiveRecord::RecordNotFound if @blog.user != current_user
   end
-  
+
   def set_blog
     @blog = Blog.find(params[:id])
   end
 
   def blog_params
-    permitted = ["title", "content"]
-    permitted << (current_user.premium? ? "random_eyecatch" : "secret")
+    permitted = %w[title content]
+    permitted << (current_user.premium? ? 'random_eyecatch' : 'secret')
     params.require(:blog).permit(permitted)
   end
 end
