@@ -11,9 +11,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    if @blog.secret && @blog.user != current_user
-      @blog = Blog.find_by!(id: nil)
-    end
+    @blog = Blog.find_by!(id: nil) if @blog.secret && @blog.user != current_user
   end
 
   def new
@@ -49,9 +47,7 @@ class BlogsController < ApplicationController
   private
 
   def authorize_user!
-    if @blog.user != current_user
-      @blog.user = User.find_by!(id: nil)
-    end
+    @blog.user = User.find_by!(id: nil) if @blog.user != current_user
   end
 
   def set_blog
