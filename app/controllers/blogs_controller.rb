@@ -11,7 +11,9 @@ class BlogsController < ApplicationController
   end
 
   def show
-    raise ActiveRecord::RecordNotFound if @blog.secret && @blog.user != current_user
+    if @blog.secret && @blog.user != current_user
+      @blog = Blog.find_by!(id: nil)
+    end
   end
 
   def new
@@ -47,7 +49,9 @@ class BlogsController < ApplicationController
   private
 
   def authorize_user!
-    raise ActiveRecord::RecordNotFound if @blog.user != current_user
+    if @blog.user != current_user
+      @blog.user = User.find_by!(id: nil)
+    end
   end
 
   def set_blog
