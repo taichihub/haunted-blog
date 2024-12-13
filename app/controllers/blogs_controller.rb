@@ -4,7 +4,6 @@ class BlogsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
 
   before_action :set_blog_with_authority_check, only: %i[show edit update destroy]
-  before_action :authorize_user!, only: %i[edit update destroy]
 
   def index
     @blogs = Blog.search(params[:term]).published.default_order
@@ -44,14 +43,11 @@ class BlogsController < ApplicationController
 
   private
 
-  def authorize_user!
-    @blog.user = User.find_by!(id: nil) if @blog.user != current_user
-  end
-
   def set_blog_with_authority_check
     @blog = Blog.where(id: params[:id]).where.not(secret: true).or(
       Blog.where(id: params[:id], user: current_user)
-    ).first!    
+    ).first!
+    redirect_to blogs_path, alert: 'You are not authorized to access this blog.' if @blog.user != current_user
   end
 
   def blog_params
