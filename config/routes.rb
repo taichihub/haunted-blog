@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   namespace :api do
     resources :blogs, only: [] do
       resources :likings, only: %i(create destroy)
-      resources :liking_users, only: :index, defaults: { format: :json }
+      resources :liking_users, only: :index
     end
   end
 end
