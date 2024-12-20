@@ -48,7 +48,7 @@ class BlogsController < ApplicationController
   def set_blog_with_authority_check
     if current_user
       @blog = Blog.where(id: params[:id]).where.not(secret: true).or(Blog.where(id: params[:id], user: current_user)).first!
-      redirect_to blogs_path, alert: 'You are not authorized to access this blog.' if @blog.user != current_user
+      redirect_to blogs_path, alert: 'You are not authorized to access this blog.' if @blog.secret? && @blog.user != current_user
     else
       @blog = Blog.where(id: params[:id]).where.not(secret: true).first!
     end
