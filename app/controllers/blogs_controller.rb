@@ -15,7 +15,13 @@ class BlogsController < ApplicationController
     @blog = Blog.new
   end
 
-  def edit; end
+  def edit
+    if @blog.owned_by?(current_user)
+      render :edit
+    else
+      redirect_to blog_path(@blog), alert: 'You are not authorized to edit this blog.'
+    end
+  end
 
   def create
     @blog = current_user.blogs.new(blog_params)
@@ -28,7 +34,7 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.update(blog_params)
+    if @blog.owned_by?(current_user) && @blog.update(blog_params)
       redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -36,16 +42,18 @@ class BlogsController < ApplicationController
   end
 
   def destroy
-    if current_user == @blog.user
-      @blog.destroy!
+    if @blog.owned_by?(current_user) && @blog.destroy!
+      redirect_to blogs_path, notice: 'Blog was successfully destroyed.', status: :see_other
+    else
+      redirect_to blog_path(@blog), alert: 'You are not authorized to destroy this blog.'
     end
-
-    redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
   end
 
   private
 
   def set_blog_with_authority_check
+    return @blog = current_user.blogs.find(params[:id]) if %w[edit update destroy].include?(action_name)
+
     if current_user
       @blog = Blog.where(id: params[:id]).where.not(secret: true).or(Blog.where(id: params[:id], user: current_user)).first!
       redirect_to blogs_path, alert: 'You are not authorized to access this blog.' if @blog.secret? && @blog.user != current_user
