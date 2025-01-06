@@ -20,7 +20,7 @@ class BlogsController < ApplicationController
     if @blog.owned_by?(current_user)
       render :edit
     else
-      redirect_to blog_path(@blog), alert: 'You are not authorized to edit this blog.'
+      render file: "public/404.html", status: :not_found, layout: false
     end
   end
 
@@ -46,7 +46,7 @@ class BlogsController < ApplicationController
     if @blog.owned_by?(current_user) && @blog.destroy!
       redirect_to blogs_path, notice: 'Blog was successfully destroyed.', status: :see_other
     else
-      redirect_to blog_path(@blog), alert: 'You are not authorized to destroy this blog.'
+      render file: "public/404.html", status: :not_found, layout: false
     end
   end
 
