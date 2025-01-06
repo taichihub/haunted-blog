@@ -59,13 +59,9 @@ class BlogsController < ApplicationController
   def set_blog_with_authority_check
     if current_user
       @blog = Blog.where(id: params[:id])
-            .where("secret != ? OR user_id = ?", true, current_user)
-            .first!
-      if @blog.secret? && @blog.user != current_user
-        ## 404 Not Found
-        raise ActiveRecord::RecordNotFound
-      end
-      redirect_to blogs_path, alert: 'You are not authorized to access this blog.' if @blog.secret? && @blog.user != current_user
+                  .where("secret = ? OR user_id = ?", false, current_user)
+                  .where.not("secret = ? AND user_id != ?", true, current_user)
+                  .first!
     else
       @blog = Blog.where(id: params[:id])
                   .where.not(secret: true)
