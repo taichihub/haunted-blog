@@ -1,7 +1,7 @@
 <%= render @blog %>
 
 <div>
-  <% if current_user && @blog.owned_by?(current_user) %>
+  <% if @blog.owned_by?(current_user) %>
     <%= link_to "Edit this blog", edit_blog_path(@blog) %> |
   <% end %>
   <%= link_to "Back to blogs", blogs_path %>
