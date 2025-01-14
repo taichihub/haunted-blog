@@ -51,16 +51,8 @@ class BlogsController < ApplicationController
   end
 
   def set_blog_with_authority_check
-    if current_user
-      @blog = Blog.where(id: params[:id])
-                  .where("secret = ? OR user_id = ?", false, current_user)
-                  .where.not("secret = ? AND user_id != ?", true, current_user)
-                  .first!
-    else
-      @blog = Blog.where(id: params[:id])
-                  .where.not(secret: true)
-                  .first!
-    end
+    @blog = Blog.find(params[:id])
+    raise ActiveRecord::RecordNotFound if @blog.secret && (!current_user || (@blog.user_id != current_user.id))
   end
 
   def blog_params
