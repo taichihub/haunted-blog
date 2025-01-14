@@ -17,11 +17,9 @@ class BlogsController < ApplicationController
   end
 
   def edit
-    if @blog.owned_by?(current_user)
-      render :edit
-    else
-      render file: "public/404.html", status: :not_found, layout: false
-    end
+    raise ActiveRecord::RecordNotFound unless @blog.owned_by?(current_user)
+
+    render :edit
   end
 
   def create
