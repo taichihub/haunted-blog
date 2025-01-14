@@ -33,11 +33,9 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.owned_by?(current_user) && @blog.update(blog_params)
-      redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
-    else
-      render :edit, status: :unprocessable_entity
-    end
+    render(:edit, status: :unprocessable_entity) if !(@blog.owned_by?(current_user) && @blog.update(blog_params))
+
+    redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
   end
 
   def destroy
