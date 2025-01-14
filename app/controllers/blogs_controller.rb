@@ -39,11 +39,9 @@ class BlogsController < ApplicationController
   end
 
   def destroy
-    if @blog.owned_by?(current_user) && @blog.destroy!
-      redirect_to blogs_path, notice: 'Blog was successfully destroyed.', status: :see_other
-    else
-      render file: "public/404.html", status: :not_found, layout: false
-    end
+    raise ActiveRecord::RecordNotFound if !(@blog.owned_by?(current_user) && @blog.destroy!)
+
+    redirect_to blogs_path, notice: 'Blog was successfully destroyed.', status: :see_other
   end
 
   private
